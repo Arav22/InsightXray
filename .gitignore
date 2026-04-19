@@ -222,4 +222,4 @@ checkpoints/
 *.zip
 
 # VS Code User Settings
-.vscode/
+.vscode
