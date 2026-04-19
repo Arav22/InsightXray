@@ -209,5 +209,10 @@ __marimo__/
 # Data
 .data/
 
-#gpu_train 
+# Log & Temporary Output files
 smi.txt
+status.txt
+gitlog.txt
+
+# Model checkpoints
+checkpoints/
