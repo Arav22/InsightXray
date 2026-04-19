@@ -216,3 +216,10 @@ gitlog.txt
 
 # Model checkpoints
 checkpoints/
+
+# Local Environment and Data Backups
+.venv_old/
+*.zip
+
+# VS Code User Settings
+.vscode/
