@@ -1,0 +1,20 @@
+# Ignore heavy local environment folders
+.venv/
+.venv_old/
+__pycache__/
+.vscode/
+.git/
+
+# Ignore massive raw dataset (not needed for prediction)
+.data/
+
+# Ignore training and evaluation scripts
+train.py
+evaluate.py
+predict.py
+data_loader.py
+
+# Ignore local output logs
+*.txt
+*.log
+*.zip
