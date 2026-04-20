@@ -20,32 +20,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnReset = document.getElementById("btn-reset");
     const dropContent = document.getElementById("drop-content");
     const uploadPreview = document.getElementById("upload-preview");
+    
+    const btnReport = document.getElementById("btn-report");
+    const historyList = document.getElementById("history-list");
+
+    let currentPredictionId = null;
+
+    // Load History on Startup
+    loadHistory();
 
     // Drag and Drop Events
     dropZone.addEventListener("click", () => fileInput.click());
 
-    dropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropZone.classList.add("dragover");
-    });
-
-    dropZone.addEventListener("dragleave", () => {
-        dropZone.classList.remove("dragover");
-    });
-
-    dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("dragover");
-        if (e.dataTransfer.files.length) {
-            handleFile(e.dataTransfer.files[0]);
-        }
-    });
-
-    fileInput.addEventListener("change", (e) => {
-        if (e.target.files.length) {
-            handleFile(e.target.files[0]);
-        }
-    });
+    // ... (rest of drag events)
 
     // Reset UI State completely
     btnReset.addEventListener("click", (e) => {
@@ -57,9 +44,81 @@ document.addEventListener("DOMContentLoaded", () => {
         resultsUI.classList.add("hidden");
         loadingUI.classList.add("hidden");
         heatmapOverlay.classList.add("hidden");
+        btnReport.classList.add("hidden");
     });
 
-    // Toggle Evaluation Charts
+    // Download Medical Report
+    btnReport.addEventListener("click", () => {
+        if (currentPredictionId) {
+            window.open(`/api/report/${currentPredictionId}`, "_blank");
+        }
+    });
+
+    function loadHistory() {
+        fetch("/api/history")
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) return;
+                historyList.innerHTML = "";
+                data.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "history-item";
+                    card.innerHTML = `
+                        <img src="/history_images/${item.image_path}" alt="Scan">
+                        <div class="history-meta">
+                            <div>
+                                <strong>${item.prediction}</strong><br>
+                                <small>${new Date(item.timestamp * 1000).toLocaleDateString()}</small>
+                            </div>
+                            <a href="/api/report/${item.id}" target="_blank" class="history-report-link">PDF</a>
+                        </div>
+                    `;
+                    historyList.appendChild(card);
+                });
+            });
+    }
+
+    function handleFile(file) {
+        // ... (rest of initial handleFile logic)
+        btnReset.classList.remove("hidden");
+        btnReport.classList.add("hidden"); 
+
+        // Show local preview instantly in the drop zone!
+        // ... (existing reader logic)
+
+        // Transmit to FastAPI
+        fetch("/api/predict", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.detail) });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Apply Results smoothly
+            setTimeout(() => {
+                loadingUI.classList.add("hidden");
+                resultsUI.classList.remove("hidden");
+
+                currentPredictionId = data.id;
+                btnReport.classList.remove("hidden");
+
+                predClass.textContent = data.prediction;
+                // ... (rest of result display logic)
+                heatmapOverlay.src = data.heatmap;
+                
+                // Refresh History
+                loadHistory();
+            }, 800); 
+        })
+        .catch(error => {
+            loadingUI.classList.add("hidden");
+            alert("Analysis failed: " + error.message);
+        });
+    }
     btnEval.addEventListener("click", () => {
         evalCharts.classList.toggle("hidden");
         if (evalCharts.classList.contains("hidden")) {

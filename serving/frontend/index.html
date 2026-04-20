@@ -58,9 +58,21 @@
                             <img id="original-preview" alt="Uploaded X-Ray">
                             <img id="heatmap-overlay" class="hidden" alt="AI Reasoning Overlay">
                         </div>
-                        <button id="btn-xai" class="btn-neo">Show AI Reasoning (Grad-CAM)</button>
+                        <div class="action-buttons">
+                            <button id="btn-xai" class="btn-neo">Show AI Reasoning (Grad-CAM)</button>
+                            <button id="btn-report" class="btn-neo btn-secondary hidden">📄 Download Medical Report</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- History Panel -->
+        <section class="glass-panel history-panel">
+            <h2 class="section-title">Patient Scan History</h2>
+            <div id="history-list" class="history-grid">
+                <!-- Loaded via JS -->
+                <p class="sub-text">No recent scans found.</p>
             </div>
         </section>
 
